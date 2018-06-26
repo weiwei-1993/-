@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>摇一摇</title>
+</head>
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+    }
+    .img{
+        width: 100%;
+    }
+    .img img{
+        width: 100%;
+    }
+</style>
+<body>
+    <div class="img">
+        <img src="img/god.gif" alt="">
+    </div>
+
+    <div class="text"></div>
+
+</body>
+<script src="js/jquery-1.9.1.js"></script>
+<script>
+    function randomNum(n, m){
+        /* Math.floor(Math.random()*10);时，可均衡获取0到9的随机整数。 */
+        var random = Math.floor(Math.random()*(m-n)) + n;
+        return random;
+    }
+    //获取加速度信息
+    //通过监听上一步获取到的x, y, z 值在一定时间范围内的变化率，进行设备是否有进行晃动的判断。
+    //而为了防止正常移动的误判，需要给该变化率设置一个合适的临界值。
+    var SHAKE_THRESHOLD = 20000;
+    var last_update = 0;
+    var x, y, z, last_x = 0, last_y = 0, last_z = 0;
+    function deviceMotionHandler(eventData) {
+        var acceleration =eventData.accelerationIncludingGravity;
+        var curTime = new Date().getTime();
+        if ((curTime-last_update)> 10) {
+            var diffTime = curTime -last_update;
+            last_update = curTime;
+            x = acceleration.x;
+            y = acceleration.y;
+            z = acceleration.z;
+            var speed = Math.abs(x +y + z - last_x - last_y - last_z) / diffTime * 10000;
+            if (speed > SHAKE_THRESHOLD) {
+                // window.removeEventListener('devicemotion',deviceMotionHandler);
+                var item = randomNum(1,6);
+                var text = ''
+                switch (item){
+                    case 1:
+                        text = '恭喜发财';
+                        break;
+                    case 2:
+                        text = '大吉大利';
+                        break;
+                    case 3:
+                        text = '一生平安';
+                        break;
+                    case 4:
+                        text = '健康长寿';
+                        break;
+                    case 5:
+                        text = '福禄双全';
+                        break;
+                }
+                alert(text)
+                //接口调试
+            }
+            last_x = x;
+            last_y = y;
+            last_z = z;
+        }
+
+    }
+    //运动事件监听
+    if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion',deviceMotionHandler,false);
+    } else {
+        alert("手机不支持摇一摇")
+    }
+</script>
+</html>
